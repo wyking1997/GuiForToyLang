@@ -3,9 +3,11 @@ package repository;
 import model.AssingnStm;
 import model.PrgState;
 import utils.MyException;
+import utils.Pair;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,6 +88,16 @@ public class Repository implements MyIRepository {
     @Override
     public Map<Integer, Integer> getHeap() {
         return this.ls.get(0).getExHeap().getHeap();
+    }
+
+    @Override
+    public Map<Integer, String> getFileTable() {
+        Map<Integer, Pair<String, BufferedReader>> map = this.ls.get(0).getExFlTable().getFileTable();
+        Map<Integer,String> result = new HashMap<>();
+        for (int key : map.keySet()){
+            result.put(key, map.get(key).getFirstEl());
+        }
+        return result;
     }
 
     @Override

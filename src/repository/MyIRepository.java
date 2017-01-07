@@ -26,4 +26,5 @@ public interface MyIRepository {
     int getNbOfProgramStates();
     List<Integer> getOutputList();
     Map<Integer, Integer> getHeap();
+    Map<Integer,String> getFileTable();
 }

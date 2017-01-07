@@ -32,6 +32,11 @@ public class ExecutionFileTable<I,T> implements MyIFileTable<I,T> {
         map.remove(key);
     }
 
+    @Override
+    public Map<I, T> getFileTable() {
+        return this.map;
+    }
+
     public String toString(){
         String res = "FileTable\n";
         for (I i : map.keySet()){

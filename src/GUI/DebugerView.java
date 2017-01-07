@@ -3,18 +3,22 @@ package GUI;
 import controller.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
+import utils.Observable;
 
-import javax.security.auth.callback.LanguageCallback;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Marius on 07/01/2017.
@@ -25,14 +29,31 @@ public class DebugerView {
     private Controller ctr;
 
     public static final ObservableList outList = FXCollections.observableArrayList();
-    ListView<Integer> outListView;
+    private ListView<Integer> outListView;
+    private TableView<Heap> heapTable = new TableView<>();
+    private final ObservableList<Heap> heapData =
+            FXCollections.observableArrayList();
+    private TableView<FileTable> fileTbTable = new TableView<>();
+    private final ObservableList<FileTable> fileTbData=
+            FXCollections.observableArrayList();
+
+    public static final ObservableList prgStateList = FXCollections.observableArrayList();
+    private ListView<String> prgStateListView;
+
+    private List<Heap> heapList;
+    private List<FileTable> fileTbList;
 
     public DebugerView(Controller ctr) {
         this.ctr = ctr;
+        heapList = new ArrayList<>();
+        fileTbList = new ArrayList<>();
+        prgStateListView = new ListView<>(prgStateList);
+
         borderPane = new BorderPane();
         borderPane.setTop(initTop());
         borderPane.setCenter(initCenter());
         borderPane.setBottom(initBottom());
+        tablesRefresh();
     }
 
     private Node initTop() {
@@ -66,11 +87,42 @@ public class DebugerView {
 
         //second line
         Label heapLabel = new Label("Heap");
+        heapLabel.setFont(new Font(16));
         Label fileTableLabel = new Label("File table");
-        grid.add(heapLabel, 1,1,3,1);
-        grid.add(fileTableLabel, 6,1,3,1);
+        fileTableLabel.setFont(new Font(16));
+        grid.add(heapLabel, 1,2,3,1);
+        grid.add(fileTableLabel, 6,2,3,1);
 
         //third line
+        //heap
+        TableColumn adrCol = new TableColumn("Adress");
+        TableColumn valCol = new TableColumn("Value");
+        adrCol.setCellValueFactory(new PropertyValueFactory<Heap,String>("adress"));
+        valCol.setCellValueFactory(new PropertyValueFactory<Heap,String>("value"));
+        heapTable.getColumns().addAll(adrCol,valCol);
+        heapTable.setItems(heapData);
+        heapData.addAll(heapList);
+        //file table
+        TableColumn idfCol = new TableColumn("Identifier");
+        TableColumn flnCol = new TableColumn("File name");
+        idfCol.setCellValueFactory(new PropertyValueFactory<FileTable,String>("identifier"));
+        flnCol.setCellValueFactory(new PropertyValueFactory<FileTable,String>("flName"));
+        fileTbTable.getColumns().addAll(idfCol,flnCol);
+        fileTbTable.setItems(fileTbData);
+        fileTbData.addAll(fileTbList);
+        grid.add(heapTable, 0,3,4,3);
+        grid.add(fileTbTable, 5,3,4,3);
+
+        //fourth line
+        Label prgStateLabel = new Label("Program state");
+        prgStateLabel.setFont(new Font(16));
+        Label simbolsLabel = new Label("Symbol table");
+        simbolsLabel.setFont(new Font(16));
+        Label stackLabel = new Label("Stack");
+        stackLabel.setFont(new Font(16));
+        grid.add(prgStateLabel, 15,0,3,1);
+        grid.add(simbolsLabel,18,0,3,1);
+        grid.add(stackLabel,21,0,3,1);
 
 
         ac.getChildren().add(grid);
@@ -83,6 +135,19 @@ public class DebugerView {
         return ac;
     }
 
+    private void tablesRefresh(){
+        heapList.clear();
+        fileTbList.clear();
+
+        Map<Integer,Integer> map = this.ctr.getHeap();
+        for(Integer key : map.keySet()){
+            heapList.add(new Heap(key, map.get(key)));
+        }
+        Map<Integer,String> map2 = this.ctr.getFileTable();
+        for(Integer key : map2.keySet()){
+            fileTbList.add(new FileTable(key, map2.get(key)));
+        }
+    }
 
     public BorderPane getView(){
         return this.borderPane;

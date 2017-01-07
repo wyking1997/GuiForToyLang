@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -13,4 +14,5 @@ public interface MyIFileTable<I,T> extends Serializable {
     T get(I key);
     void add(I key, T el);
     void remove(I key);
+    Map<I,T> getFileTable();
 }

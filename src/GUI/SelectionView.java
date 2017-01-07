@@ -29,8 +29,6 @@ public class SelectionView {
 
     public static final ObservableList programs = FXCollections.observableArrayList();
     private ListView<String> list;
-    private TableColumn<IStm,String> IdColumn;
-    private TableColumn<IStm,String> ProgramColumn;
     private Button buttonok= new Button("Ok");
 
 

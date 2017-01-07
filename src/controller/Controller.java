@@ -29,6 +29,7 @@ public class Controller {
     public Map<Integer,Integer> getHeap(){
         return this.repo.getHeap();
     }
+    public Map<Integer,String> getFileTable(){return repo.getFileTable();}
 
     public Controller(MyIRepository r) {
         repo = r;
