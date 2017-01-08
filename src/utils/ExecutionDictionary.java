@@ -82,4 +82,9 @@ public class ExecutionDictionary<S,I> implements MyIDictionary<S,I> {
             }
         return res + "::::::::::::::::\n";
     }
+
+    @Override
+    public Map<S,I> getTable() {
+        return this.map;
+    }
 }

@@ -10,10 +10,15 @@ import java.io.Serializable;
  */
 public class PrgState implements Serializable {
 
-    static int ID = 1;
+    static int ID = 0;
 
     MyIStack<IStm> exStack;
     MyIDictionary<String, Integer> exDict;
+
+    public int getId() {
+        return id;
+    }
+
     MyIOut<Integer> exOut;
     MyIFileTable<Integer, Pair<String,BufferedReader>> exFlTable;
     MyIHeap<Integer> exHeap;

@@ -2,6 +2,7 @@ package utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Created by Wyking on 10/23/2016.
@@ -17,4 +18,6 @@ public interface MyIDictionary<S,I> extends Serializable {
     MyIDictionary<S,I> deepCopy();
 
     String toString();
+
+    Map<S,I> getTable();
 }

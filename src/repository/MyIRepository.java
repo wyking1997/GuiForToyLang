@@ -27,4 +27,7 @@ public interface MyIRepository {
     List<Integer> getOutputList();
     Map<Integer, Integer> getHeap();
     Map<Integer,String> getFileTable();
+    List<String> getProgramStates();
+    Map<String,Integer> getSymbolTable(int index);
+    List<String> getStack(int index);
 }

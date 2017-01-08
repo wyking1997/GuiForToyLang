@@ -3,22 +3,15 @@ package GUI;
 import controller.Controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
-import utils.Observable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Marius on 07/01/2017.
@@ -27,27 +20,33 @@ public class DebugerView {
 
     private BorderPane borderPane;
     private Controller ctr;
+    private int prgStateIndex = 0;
 
-    public static final ObservableList outList = FXCollections.observableArrayList();
     private ListView<Integer> outListView;
+    public static final ObservableList outList = FXCollections.observableArrayList();
     private TableView<Heap> heapTable = new TableView<>();
-    private final ObservableList<Heap> heapData =
-            FXCollections.observableArrayList();
+    private static final ObservableList<Heap> heapData = FXCollections.observableArrayList();
     private TableView<FileTable> fileTbTable = new TableView<>();
-    private final ObservableList<FileTable> fileTbData=
-            FXCollections.observableArrayList();
+    private static final ObservableList<FileTable> fileTbData = FXCollections.observableArrayList();
+    private TableView<SimbolTable> simbolTbTable = new TableView<>();
+    private static final ObservableList<SimbolTable> simbolTbData = FXCollections.observableArrayList();
 
-    public static final ObservableList prgStateList = FXCollections.observableArrayList();
     private ListView<String> prgStateListView;
+    public static final ObservableList prgStateList = FXCollections.observableArrayList();
+    private ListView<String> stackListView;
+    public static final ObservableList stackList = FXCollections.observableArrayList();
 
     private List<Heap> heapList;
     private List<FileTable> fileTbList;
+    private List<SimbolTable> simbolTbList;
 
     public DebugerView(Controller ctr) {
         this.ctr = ctr;
         heapList = new ArrayList<>();
         fileTbList = new ArrayList<>();
+        simbolTbList = new ArrayList<>();
         prgStateListView = new ListView<>(prgStateList);
+        stackListView = new ListView<>(stackList);
 
         borderPane = new BorderPane();
         borderPane.setTop(initTop());
@@ -71,35 +70,44 @@ public class DebugerView {
         grid.setVgap(10);
         grid.setPadding(new Insets(0, 10, 0, 10));
 
-        //first line
+        //labels for program states and output, listview for output, text field for program states
+        //buttons for oneStep and allStep
+        HBox hb = new HBox();
+        hb.setSpacing(10);
         Label prgLabel = new Label("Program states");
+        prgLabel.setFont(new Font(16));
         TextField prgText = new TextField("" + ctr.getNbOfProgramStates());
         Label outLabel = new Label("Output");
+        outLabel.setFont(new Font(16));
         outListView = new ListView<>(outList);
-        outListView.setMinWidth(100);
+        outListView.setMinWidth(50);
         outListView.setMaxHeight(25);
         outListView.setOrientation(Orientation.HORIZONTAL);
-        outList.addAll(this.ctr.getOutputList());
-        grid.add(prgLabel,0,0);
-        grid.add(prgText, 1,0);
-        grid.add(outLabel, 6, 0);
-        grid.add(outListView, 7, 0);
+        Button oneStepButton = new Button("One step");
+        Button allStepButton = new Button("All step");
+        oneStepButton.setMinWidth(150);
+        allStepButton.setMinWidth(150);
+        oneStepButton.setOnAction(this::oneStepAction);
+        allStepButton.setOnAction(this::allStepAction);
+        hb.getChildren().addAll(prgLabel,prgText,outLabel,outListView, oneStepButton, allStepButton);
+        grid.add(hb,0,0,10,1);
 
-        //second line
+        //labels for heap and filetable
         Label heapLabel = new Label("Heap");
         heapLabel.setFont(new Font(16));
         Label fileTableLabel = new Label("File table");
         fileTableLabel.setFont(new Font(16));
-        grid.add(heapLabel, 1,2,3,1);
-        grid.add(fileTableLabel, 6,2,3,1);
+        grid.add(heapLabel, 0,2);
+        grid.add(fileTableLabel, 1,2);
 
-        //third line
+        //the table views for heap and file table
         //heap
         TableColumn adrCol = new TableColumn("Adress");
         TableColumn valCol = new TableColumn("Value");
         adrCol.setCellValueFactory(new PropertyValueFactory<Heap,String>("adress"));
         valCol.setCellValueFactory(new PropertyValueFactory<Heap,String>("value"));
         heapTable.getColumns().addAll(adrCol,valCol);
+        heapTable.setMaxWidth(160d);
         heapTable.setItems(heapData);
         heapData.addAll(heapList);
         //file table
@@ -108,22 +116,45 @@ public class DebugerView {
         idfCol.setCellValueFactory(new PropertyValueFactory<FileTable,String>("identifier"));
         flnCol.setCellValueFactory(new PropertyValueFactory<FileTable,String>("flName"));
         fileTbTable.getColumns().addAll(idfCol,flnCol);
+        fileTbTable.setMaxWidth(160d);
         fileTbTable.setItems(fileTbData);
         fileTbData.addAll(fileTbList);
-        grid.add(heapTable, 0,3,4,3);
-        grid.add(fileTbTable, 5,3,4,3);
+        grid.add(heapTable, 0,3);
+        grid.add(fileTbTable, 1,3);
 
-        //fourth line
+        //labels for program state, symbol table, stack
         Label prgStateLabel = new Label("Program state");
         prgStateLabel.setFont(new Font(16));
         Label simbolsLabel = new Label("Symbol table");
         simbolsLabel.setFont(new Font(16));
         Label stackLabel = new Label("Stack");
         stackLabel.setFont(new Font(16));
-        grid.add(prgStateLabel, 15,0,3,1);
-        grid.add(simbolsLabel,18,0,3,1);
-        grid.add(stackLabel,21,0,3,1);
+        grid.add(prgStateLabel, 4,2);
+        grid.add(simbolsLabel,3,2);
+        grid.add(stackLabel,5,2);
 
+        //prg state list view
+        prgStateListView = new ListView<>(prgStateList);
+        prgStateListView.setMaxWidth(160d);
+        prgStateListView.getSelectionModel().selectedItemProperty().addListener(this::selectedPrgState);
+        grid.add(prgStateListView, 4, 3);
+
+        //simbolTb table
+        TableColumn nameCol = new TableColumn("Variable");
+        TableColumn valueCol = new TableColumn("Value");
+        nameCol.setCellValueFactory(new PropertyValueFactory<SimbolTable,String>("name"));
+        valueCol.setCellValueFactory(new PropertyValueFactory<SimbolTable,String>("value"));
+        simbolTbTable.getColumns().addAll(nameCol,valCol);
+        simbolTbTable.setMaxWidth(160d);
+        simbolTbTable.setItems(simbolTbData);
+        simbolTbData.addAll(simbolTbList);
+        grid.add(simbolTbTable, 3,3);
+
+        //stack list view
+        stackListView = new ListView<>(stackList);
+        stackListView.setMinWidth(480d);
+        stackListView.setMaxWidth(480d);
+        grid.add(stackListView, 5,3,3,1);
 
         ac.getChildren().add(grid);
         AnchorPane.setTopAnchor(grid, 20d);
@@ -139,17 +170,54 @@ public class DebugerView {
         heapList.clear();
         fileTbList.clear();
 
+        //heap
         Map<Integer,Integer> map = this.ctr.getHeap();
         for(Integer key : map.keySet()){
             heapList.add(new Heap(key, map.get(key)));
         }
+        //file table
         Map<Integer,String> map2 = this.ctr.getFileTable();
         for(Integer key : map2.keySet()){
             fileTbList.add(new FileTable(key, map2.get(key)));
         }
+        outList.clear();
+        outList.addAll(this.ctr.getOutputList());
+        //program states
+        prgStateList.clear();
+        prgStateList.addAll(ctr.getPrgList());
+        prgStateListView.getSelectionModel().select(0);
+    }
+
+    private void selectedPrgState(javafx.beans.Observable e){
+        prgStateIndex = prgStateListView.getSelectionModel().getSelectedIndices().get(0);
+        refreshSymbolTable();
+        refreshStack();
+    }
+
+    private void refreshStack() {
+        stackList.clear();
+        stackList.addAll(ctr.getStack(prgStateIndex));
+    }
+
+    private void refreshSymbolTable() {
+        simbolTbList.clear();
+        if (prgStateIndex == -1)
+            prgStateIndex = 0;
+        Map<String,Integer> map = ctr.getSymbolTable(prgStateIndex);
+        for(String k : map.keySet())
+            simbolTbList.add(new SimbolTable(k, map.get(k)));
     }
 
     public BorderPane getView(){
         return this.borderPane;
+    }
+
+    private void oneStepAction(javafx.event.ActionEvent e){
+
+    }
+
+    private void allStepAction(javafx.event.ActionEvent e){
+        ctr.executeAllStep();
+        tablesRefresh();
     }
 }

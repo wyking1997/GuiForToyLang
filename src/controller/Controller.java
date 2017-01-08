@@ -30,6 +30,9 @@ public class Controller {
         return this.repo.getHeap();
     }
     public Map<Integer,String> getFileTable(){return repo.getFileTable();}
+    public List<String> getPrgList(){return repo.getProgramStates();}
+    public Map<String,Integer> getSymbolTable(int index){return repo.getSymbolTable(index);}
+    public List<String> getStack(int index){return repo.getStack(index);}
 
     public Controller(MyIRepository r) {
         repo = r;

@@ -80,7 +80,7 @@ public class SelectionView {
         int index = list.getSelectionModel().getSelectedIndices().get(0);
         if (index > -1 && index < controllers.size()) {
             DebugerView debuger = new DebugerView(this.controllers.get(index));
-            primaryStage.setScene(new Scene(debuger.getView(), 840, 550));
+            primaryStage.setScene(new Scene(debuger.getView(), 1230, 600));
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");

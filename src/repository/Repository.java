@@ -1,15 +1,13 @@
 package repository;
 
 import model.AssingnStm;
+import model.IStm;
 import model.PrgState;
 import utils.MyException;
 import utils.Pair;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Wyking on 10/29/2016.
@@ -98,6 +96,30 @@ public class Repository implements MyIRepository {
             result.put(key, map.get(key).getFirstEl());
         }
         return result;
+    }
+
+    @Override
+    public List<String> getProgramStates() {
+        ArrayList<String> result = new ArrayList<>();
+        for (PrgState prg : ls)
+            result.add("prg " + prg.getId());
+        return result;
+    }
+
+    @Override
+    public Map<String, Integer> getSymbolTable(int index) {
+        return ls.get(index).getExDict().getTable();
+    }
+
+    @Override
+    public List<String> getStack(int index) {
+        List<String> list = new ArrayList<>();
+        Stack<IStm> stack = this.ls.get(index).getExStack().getStack();
+        while (!stack.isEmpty()){
+            IStm stm = stack.pop();
+            list.add(stm.toString());
+        }
+        return list;
     }
 
     @Override

@@ -42,5 +42,12 @@ public class ExecutionStack<T> implements MyIStack<T> {
             s += el.toString() + "\n";
         }
         return s + "::::::::::::::::\n";
-    };
+    }
+
+    @Override
+    public Stack<T> getStack() {
+        return this.stack;
+    }
+
+    ;
 }
