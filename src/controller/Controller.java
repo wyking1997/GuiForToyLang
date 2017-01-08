@@ -36,6 +36,7 @@ public class Controller {
 
     public Controller(MyIRepository r) {
         repo = r;
+        repo.init_file();
     }
 
     public void add(PrgState state) {
@@ -43,10 +44,9 @@ public class Controller {
     }
 
     public void executeAllStep(){
-        repo.init_file();
-        executor = Executors.newFixedThreadPool(2);
         while(true){
-            List<PrgState> prgList=removeCompletedPrg(repo.getPrgList());
+            List<PrgState> l = repo.getPrgList();
+            List<PrgState> prgList=removeCompletedPrg(l);
             if (prgList.size() == 0)
                 break;
             try {
@@ -57,41 +57,30 @@ public class Controller {
                 System.exit(1);
             }
         }
-        executor.shutdownNow();
+    }
+
+    public int executeOneStep(){
+        List<PrgState> l = repo.getPrgList();
+        List<PrgState> prgList=removeCompletedPrg(l);
+        if (prgList.size() == 0)
+            return 0;
+        try {
+            oneStepForAllPrg(prgList);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 
     private List<PrgState> removeCompletedPrg(List<PrgState> inPrgList){
-        return inPrgList.stream()
+        List<PrgState> x = inPrgList.stream()
                 .filter(p -> p.isNotCompleted())
                 .collect(Collectors.toList());
-    }
-
-    public String getOutputFile(){
-        return repo.getOutputFile();
-    }
-
-    public void serialize(String file_name){
-        try {
-            repo.serialize(repo.get(0), file_name);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public PrgState deserialize(String file_name) throws Exception{
-        return repo.deserializare(file_name);
-    }
-
-    Map<Integer,Integer> conservativeGarbageCollector(Collection<Integer> symTableValues, Map<Integer,Integer> heap){
-        Map<Integer,Integer> mp = heap.entrySet().stream()
-                .filter(e->symTableValues.contains(e.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue));
-        return mp;
+        return x;
     }
 
     void oneStepForAllPrg(List<PrgState> ls) throws Exception {
-        
-        ls.forEach(prg -> repo.logPrgStateExec(prg.toString()));
+        executor = Executors.newFixedThreadPool(2);
         List<Callable<PrgState>> callList = ls.stream()
                                               .map((PrgState p)->(Callable<PrgState>)(() -> {return p.oneStep();}))
                                               .collect(Collectors.toList());
@@ -107,10 +96,8 @@ public class Controller {
                                                             }
                                             ).filter(p -> p != null)
                                              .collect(Collectors.toList());
-        //add the new created threads to the list of existing threads
         repo.addAll(newPrgList);
-        //Log the PrgStates after the execution
-        repo.getPrgList().forEach(prg ->repo.logPrgStateExec(prg));
-        repo.logPrgStateExec("-----------------------------------------------------------------------------------");
+        executor.shutdownNow();
     }
+
 }

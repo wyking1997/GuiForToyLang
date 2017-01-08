@@ -15,12 +15,8 @@ public interface MyIRepository {
     void add(PrgState state);
     PrgState get(int position) throws Exception;
     void logPrgStateExec(String data);
-    void logPrgStateExec(PrgState state);
-    String getOutputFile();
-    void serialize(PrgState state, String serialize_file_name);
-    PrgState deserializare(String file_name) throws Exception;
+//    PrgState deserializare(String file_name) throws Exception;
     List<PrgState> getPrgList();
-    void setPrgList(List<PrgState> p);
     void init_file();
 
     int getNbOfProgramStates();

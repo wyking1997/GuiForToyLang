@@ -140,49 +140,8 @@ public class Repository implements MyIRepository {
     }
 
     @Override
-    public void logPrgStateExec(PrgState state) {
-        logPrgStateExec(state.toString());
-    }
-
-    @Override
-    public String getOutputFile() {
-        return file_name;
-    }
-
-    @Override
-    public void serialize(PrgState state, String serialize_file_name) {
-        serialize_file_name = "files\\serialized_files\\" + serialize_file_name;
-        try{
-            ObjectOutputStream objStream = new ObjectOutputStream(new FileOutputStream(serialize_file_name));
-            objStream.writeObject(state);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public PrgState deserializare(String serialize_file_name) throws Exception{
-        serialize_file_name = "files\\serialized_files\\" + serialize_file_name;
-        try{
-            ObjectInputStream objStream = new ObjectInputStream(new FileInputStream(serialize_file_name));
-            Object obj = objStream.readObject();
-            if (obj instanceof PrgState)
-                return (PrgState)obj;
-            throw new MyException("");
-        }catch (Exception e){
-            throw e;
-        }
-    }
-
-    @Override
     public List<PrgState> getPrgList() {
         return ls;
-    }
-
-    @Override
-    public void setPrgList(List<PrgState> p) {
-        this.ls.clear();
-        ls.addAll(p);
     }
 
 }

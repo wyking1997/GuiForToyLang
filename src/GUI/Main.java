@@ -27,6 +27,8 @@ public class Main extends Application {
         Stage primaryStage = new Stage();
         Parent root = (new SelectionView(controllers, program_repr, primaryStage)).getSelectionView();
         Scene scene = new Scene(root, 840, 550);
+        primaryStage.centerOnScreen();
+        primaryStage.setResizable(false);
         primaryStage.setTitle("Go for it");
         primaryStage.setScene(scene);
         primaryStage.show();

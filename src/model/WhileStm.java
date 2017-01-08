@@ -16,7 +16,7 @@ public class WhileStm implements IStm {
     @Override
     public PrgState execute(PrgState state) throws Exception {
         if (condition.eval(state.getExDict(),state.getExHeap()) == 0)
-            return state;
+            return null;
         state.getExStack().push(this);
         state.getExStack().push(stm);
         return null;

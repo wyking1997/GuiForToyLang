@@ -39,6 +39,7 @@ public class DebugerView {
     private List<Heap> heapList;
     private List<FileTable> fileTbList;
     private List<SimbolTable> simbolTbList;
+    TextField prgText;
 
     public DebugerView(Controller ctr) {
         this.ctr = ctr;
@@ -57,7 +58,7 @@ public class DebugerView {
 
     private Node initTop() {
         Label label = new Label("Debugger");
-        label.setFont(new Font(20));
+        label.setFont(new Font(32));
         AnchorPane ac = new AnchorPane(label);
         AnchorPane.setLeftAnchor(label, 20d);
         AnchorPane.setTopAnchor(label, 20d);
@@ -76,7 +77,7 @@ public class DebugerView {
         hb.setSpacing(10);
         Label prgLabel = new Label("Program states");
         prgLabel.setFont(new Font(16));
-        TextField prgText = new TextField("" + ctr.getNbOfProgramStates());
+        prgText = new TextField("" + ctr.getNbOfProgramStates());
         Label outLabel = new Label("Output");
         outLabel.setFont(new Font(16));
         outListView = new ListView<>(outList);
@@ -107,7 +108,8 @@ public class DebugerView {
         adrCol.setCellValueFactory(new PropertyValueFactory<Heap,String>("adress"));
         valCol.setCellValueFactory(new PropertyValueFactory<Heap,String>("value"));
         heapTable.getColumns().addAll(adrCol,valCol);
-        heapTable.setMaxWidth(160d);
+        heapTable.setMaxWidth(163d);
+        heapTable.setMinWidth(163d);
         heapTable.setItems(heapData);
         heapData.addAll(heapList);
         //file table
@@ -116,7 +118,8 @@ public class DebugerView {
         idfCol.setCellValueFactory(new PropertyValueFactory<FileTable,String>("identifier"));
         flnCol.setCellValueFactory(new PropertyValueFactory<FileTable,String>("flName"));
         fileTbTable.getColumns().addAll(idfCol,flnCol);
-        fileTbTable.setMaxWidth(160d);
+        fileTbTable.setMaxWidth(163d);
+        fileTbTable.setMinWidth(163d);
         fileTbTable.setItems(fileTbData);
         fileTbData.addAll(fileTbList);
         grid.add(heapTable, 0,3);
@@ -135,7 +138,8 @@ public class DebugerView {
 
         //prg state list view
         prgStateListView = new ListView<>(prgStateList);
-        prgStateListView.setMaxWidth(160d);
+        prgStateListView.setMaxWidth(163d);
+        prgStateListView.setMinWidth(163d);
         prgStateListView.getSelectionModel().selectedItemProperty().addListener(this::selectedPrgState);
         grid.add(prgStateListView, 4, 3);
 
@@ -144,8 +148,9 @@ public class DebugerView {
         TableColumn valueCol = new TableColumn("Value");
         nameCol.setCellValueFactory(new PropertyValueFactory<SimbolTable,String>("name"));
         valueCol.setCellValueFactory(new PropertyValueFactory<SimbolTable,String>("value"));
-        simbolTbTable.getColumns().addAll(nameCol,valCol);
-        simbolTbTable.setMaxWidth(160d);
+        simbolTbTable.getColumns().addAll(nameCol,valueCol);
+        simbolTbTable.setMaxWidth(163d);
+        simbolsLabel.setMinWidth(163d);
         simbolTbTable.setItems(simbolTbData);
         simbolTbData.addAll(simbolTbList);
         grid.add(simbolTbTable, 3,3);
@@ -169,17 +174,22 @@ public class DebugerView {
     private void tablesRefresh(){
         heapList.clear();
         fileTbList.clear();
+        heapData.clear();
+        fileTbData.clear();
+        prgText.setText("" + ctr.getNbOfProgramStates());
 
         //heap
         Map<Integer,Integer> map = this.ctr.getHeap();
         for(Integer key : map.keySet()){
             heapList.add(new Heap(key, map.get(key)));
         }
+        heapData.addAll(heapList);
         //file table
         Map<Integer,String> map2 = this.ctr.getFileTable();
         for(Integer key : map2.keySet()){
             fileTbList.add(new FileTable(key, map2.get(key)));
         }
+        fileTbData.addAll(fileTbList);
         outList.clear();
         outList.addAll(this.ctr.getOutputList());
         //program states
@@ -196,7 +206,8 @@ public class DebugerView {
 
     private void refreshStack() {
         stackList.clear();
-        stackList.addAll(ctr.getStack(prgStateIndex));
+        List<String> ls = ctr.getStack(prgStateIndex);
+        stackList.addAll(ls);
     }
 
     private void refreshSymbolTable() {
@@ -206,6 +217,8 @@ public class DebugerView {
         Map<String,Integer> map = ctr.getSymbolTable(prgStateIndex);
         for(String k : map.keySet())
             simbolTbList.add(new SimbolTable(k, map.get(k)));
+        simbolTbData.clear();
+        simbolTbData.addAll(simbolTbList);
     }
 
     public BorderPane getView(){
@@ -213,7 +226,15 @@ public class DebugerView {
     }
 
     private void oneStepAction(javafx.event.ActionEvent e){
-
+        int i = ctr.executeOneStep();
+        if (i == 0){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("NEW INFORMATIONS");
+            alert.setHeaderText("Execution completed");
+            alert.setContentText("The program execution completed!");
+            alert.showAndWait();
+        }
+        tablesRefresh();
     }
 
     private void allStepAction(javafx.event.ActionEvent e){

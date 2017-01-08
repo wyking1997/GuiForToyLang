@@ -81,13 +81,14 @@ public class SelectionView {
         if (index > -1 && index < controllers.size()) {
             DebugerView debuger = new DebugerView(this.controllers.get(index));
             primaryStage.setScene(new Scene(debuger.getView(), 1230, 600));
+            primaryStage.centerOnScreen();
+            primaryStage.setResizable(false);
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("An error ocured during the execution...");
             alert.setContentText("There was nothing selected from the list, to start the debugger you first need" +
                     "to select a program from the given list!");
-
             alert.showAndWait();
         }
     }

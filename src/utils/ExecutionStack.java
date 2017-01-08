@@ -46,7 +46,7 @@ public class ExecutionStack<T> implements MyIStack<T> {
 
     @Override
     public Stack<T> getStack() {
-        return this.stack;
+        return (Stack<T>)this.stack.clone();
     }
 
     ;
